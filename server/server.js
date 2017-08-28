@@ -21,10 +21,11 @@ app.use(expressJwt({
         }
         return null;
     }
-}).unless({ path: ['/users/authenticate', '/users/register'] }));
+}).unless({ path: ['/users/authenticate', '/users/register', '/posts', '/posts/create', '/posts/deleteAll'] }));
 
 // routes
 app.use('/users', require('./controllers/users.controller'));
+app.use('/posts', require('./controllers/posts.controller'));
 
 // start server
 var port = process.env.NODE_ENV === 'production' ? 80 : 4000;

@@ -1,7 +1,7 @@
 ﻿import { Component, OnInit } from '@angular/core';
 
-import { User } from '../_models/index';
-import { UserService } from '../_services/index';
+import { User, Post } from '../_models/index';
+import { UserService, AlertService, PostService } from '../_services/index';
 
 @Component({
     moduleId: module.id,
@@ -11,13 +11,20 @@ import { UserService } from '../_services/index';
 export class HomeComponent implements OnInit {
     currentUser: User;
     users: User[] = [];
+    posts: Post[] = [];
+    model: any = {};
+    loading = false;
 
-    constructor(private userService: UserService) {
+    constructor(
+        private userService: UserService, 
+        private alertService: AlertService, 
+        private postService: PostService) {
+
         this.currentUser = JSON.parse(localStorage.getItem('currentUser'));
     }
 
     ngOnInit() {
-        this.loadAllUsers();
+        this.loadAllPosts();
     }
 
     deleteUser(_id: string) {
@@ -26,5 +33,26 @@ export class HomeComponent implements OnInit {
 
     private loadAllUsers() {
         this.userService.getAll().subscribe(users => { this.users = users; });
+    }
+
+    private loadAllPosts() {
+        this.postService.getAll().subscribe(posts => { this.posts = posts; });
+    }
+
+    submitPost() {
+        this.loading = true;
+        console.log(this.model);
+        
+        this.postService.create(this.model)
+            .subscribe(
+                data => {
+                    this.alertService.success('Post successful', true);
+                    this.loading = false;
+                    this.loadAllPosts();
+                },
+                error => {
+                    this.alertService.error(error);
+                    this.loading = false;
+                });
     }
 }
